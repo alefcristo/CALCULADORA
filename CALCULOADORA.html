@@ -1,0 +1,1306 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#6B3FA0">
+  <title>Calculadora das Papeleiras</title>
+  <meta name="description" content="Calculadora de orçamentos para artesãs - Calcule custos e gere orçamentos profissionais">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --bg: #FAFAFA;
+      --bg-card: #FFFFFF;
+      --primary: #6B3FA0;
+      --primary-light: #8B5FBF;
+      --primary-dark: #4A2B70;
+      --secondary: #D4C1E8;
+      --secondary-light: #EDE5F5;
+      --text: #2D2D2D;
+      --text-muted: #6B6B6B;
+      --text-light: #9B9B9B;
+      --border: #E8E8E8;
+      --success: #4CAF50;
+      --radius: 16px;
+      --radius-sm: 12px;
+      --shadow: 0 2px 8px rgba(107, 63, 160, 0.08);
+      --shadow-md: 0 4px 16px rgba(107, 63, 160, 0.12);
+      --safe-bottom: env(safe-area-inset-bottom, 16px);
+    }
+
+    html, body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.5;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      padding-bottom: calc(100px + var(--safe-bottom));
+    }
+
+    /* Header */
+    .app-header {
+      background: var(--bg-card);
+      padding: 16px 20px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .app-header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 2px;
+    }
+
+    .app-header p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Tab Navigation */
+    .tab-nav {
+      display: flex;
+      background: var(--secondary-light);
+      border-radius: var(--radius);
+      padding: 4px;
+      margin: 16px 16px 0;
+      gap: 4px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px 16px;
+      border: none;
+      background: transparent;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--bg-card);
+      color: var(--primary);
+      box-shadow: var(--shadow);
+    }
+
+    /* Main Content */
+    .main-content {
+      padding: 16px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      user-select: none;
+    }
+
+    .card-header h3 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .card-header .emoji {
+      font-size: 20px;
+    }
+
+    .card-body {
+      display: block;
+      padding: 0 16px 16px;
+    }
+
+    /* Material Item */
+    .material-item {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .material-item:last-child {
+      border-bottom: none;
+    }
+
+    .material-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .material-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .price-input-group {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0 12px;
+      height: 44px;
+    }
+
+    .price-input-group span {
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 14px;
+      margin-right: 4px;
+    }
+
+    .price-input-group input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      outline: none;
+      width: 100%;
+    }
+
+    .qty-controls {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+
+    .qty-btn {
+      width: 44px;
+      height: 44px;
+      border: none;
+      background: transparent;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s ease;
+    }
+
+    .qty-btn:active {
+      background: var(--secondary-light);
+    }
+
+    .qty-btn:disabled {
+      color: var(--text-light);
+      cursor: not-allowed;
+    }
+
+    .qty-value {
+      width: 48px;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .material-subtotal {
+      font-size: 13px;
+      color: var(--primary);
+      font-weight: 600;
+      margin-top: 8px;
+      text-align: right;
+    }
+
+    /* Special Materials Textarea */
+    .textarea-container {
+      padding: 16px;
+    }
+
+    .textarea-container label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .textarea-container textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 14px;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .textarea-container textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .textarea-hint {
+      font-size: 12px;
+      color: var(--text-light);
+      margin-top: 6px;
+    }
+
+    /* Profit Margin */
+    .profit-section {
+      padding: 16px;
+    }
+
+    .profit-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+
+    .profit-btn {
+      width: 60px;
+      height: 56px;
+      border: none;
+      background: transparent;
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s ease;
+    }
+
+    .profit-btn:active {
+      background: var(--secondary-light);
+    }
+
+    .profit-btn:disabled {
+      color: var(--text-light);
+      cursor: not-allowed;
+    }
+
+    .profit-display {
+      min-width: 100px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Quick Budget Form */
+    .quick-form {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .form-group textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .price-input-large {
+      display: flex;
+      align-items: center;
+      background: var(--secondary-light);
+      border: 2px solid var(--primary);
+      border-radius: var(--radius);
+      padding: 0 20px;
+      height: 64px;
+    }
+
+    .price-input-large span {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-right: 8px;
+    }
+
+    .price-input-large input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary);
+      outline: none;
+      padding: 0;
+    }
+
+    /* Bottom Bar */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      padding: 12px 16px calc(12px + var(--safe-bottom));
+      z-index: 100;
+    }
+
+    .total-display {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .total-label {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .total-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .generate-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    .generate-btn:active {
+      background: var(--primary-dark);
+      transform: scale(0.98);
+    }
+
+    .generate-btn:disabled {
+      background: var(--text-light);
+      cursor: not-allowed;
+    }
+
+    /* Budget Preview Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 200;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .modal-content {
+      background: var(--bg-card);
+      width: 100%;
+      max-height: 90vh;
+      border-radius: 24px 24px 0 0;
+      padding: 20px;
+      padding-bottom: calc(20px + var(--safe-bottom));
+      overflow-y: auto;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-header h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .close-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: var(--bg);
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+    }
+
+    /* Budget Image Preview */
+    .budget-preview {
+      background: linear-gradient(135deg, #6B3FA0 0%, #8B5FBF 100%);
+      border-radius: var(--radius);
+      padding: 24px;
+      color: white;
+      margin-bottom: 16px;
+    }
+
+    .budget-preview .company {
+      font-size: 14px;
+      font-weight: 500;
+      opacity: 0.9;
+      margin-bottom: 4px;
+    }
+
+    .budget-preview .title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .budget-preview .client-label {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-bottom: 2px;
+    }
+
+    .budget-preview .client-name {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .budget-preview .description {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .budget-preview .divider {
+      height: 1px;
+      background: rgba(255,255,255,0.3);
+      margin: 16px 0;
+    }
+
+    .budget-preview .price-label {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-bottom: 4px;
+    }
+
+    .budget-preview .price-value {
+      font-size: 32px;
+      font-weight: 700;
+    }
+
+    .budget-preview .date {
+      font-size: 12px;
+      opacity: 0.7;
+      margin-top: 16px;
+      text-align: right;
+    }
+
+    /* Modal Actions */
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .action-btn {
+      flex: 1;
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn.primary {
+      background: var(--primary);
+      color: white;
+      border: none;
+    }
+
+    .action-btn.primary:active {
+      background: var(--primary-dark);
+    }
+
+    .action-btn.secondary {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .action-btn.secondary:active {
+      background: var(--secondary-light);
+    }
+
+    /* Info Form in Modal */
+    .info-form {
+      margin-bottom: 16px;
+    }
+
+    .info-form .form-group {
+      margin-bottom: 12px;
+    }
+
+    .info-form input,
+    .info-form textarea {
+      padding: 12px 14px;
+      font-size: 14px;
+    }
+
+    /* Tip Banner */
+    .tip-banner {
+      background: var(--secondary-light);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .tip-banner .icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .tip-banner p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Clear Button */
+    .clear-section {
+      text-align: center;
+      padding: 16px 0;
+    }
+
+    .clear-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 12px 24px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .clear-btn:active {
+      background: var(--bg);
+    }
+
+    /* SVG Icons inline */
+    .icon-chevron {
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    /* Hidden canvas for image generation */
+    #budgetCanvas {
+      display: none;
+    }
+  </style>
+
+</style>
+<meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b3a8e372-83d3-4d08-8da0-00c307667dea/id-preview-a7c89f3e--4f84a141-a14d-4993-b98d-d5274682de49.lovable.app-1769704072329.png" /></head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <h1>Calculadora das Papeleiras</h1>
+    <p>& das Decoradoras de Festa</p>
+  </header>
+
+  <!-- Tab Navigation -->
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-tab="calculator">Calcular</button>
+    <button class="tab-btn" data-tab="quick">Orçamento Rápido</button>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Calculator Tab -->
+    <div id="calculator-tab" class="tab-content active">
+      <div class="tip-banner">
+        <span class="icon">💡</span>
+        <p>Preencha os materiais usados e suas quantidades. O valor final será calculado automaticamente!</p>
+      </div>
+
+      <!-- Materials Card -->
+      <div class="card" id="materials-card">
+        <div class="card-header">
+          <h3><span class="emoji">🎂</span> Materiais</h3>
+        </div>
+        <div class="card-body" id="materials-list">
+          <!-- Materials will be inserted here by JS -->
+        </div>
+      </div>
+
+      <!-- Labor Card -->
+      <div class="card" id="labor-card">
+        <div class="card-header">
+          <h3><span class="emoji">⏰</span> Mão de Obra</h3>
+        </div>
+        <div class="card-body">
+          <div class="material-item" style="border-bottom: none; padding-bottom: 0;">
+            <div class="material-name">Hora de trabalho</div>
+            <div class="material-controls">
+              <div class="price-input-group">
+                <span>R$</span>
+                <input type="number" id="labor-price" value="6.90" step="0.10" min="0" onchange="updateTotal()">
+              </div>
+              <div class="qty-controls">
+                <button class="qty-btn" onclick="adjustLaborQty(-1)">−</button>
+                <div class="qty-value" id="labor-qty">0</div>
+                <button class="qty-btn" onclick="adjustLaborQty(1)">+</button>
+              </div>
+            </div>
+            <div class="material-subtotal" id="labor-subtotal"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profit Card -->
+      <div class="card" id="profit-card">
+        <div class="card-header">
+          <h3><span class="emoji">📈</span> Margem de Lucro</h3>
+        </div>
+        <div class="card-body">
+          <div class="profit-section" style="padding: 0;">
+            <div class="profit-controls">
+              <button class="profit-btn" onclick="adjustProfit(-10)">−</button>
+              <div class="profit-display" id="profit-value">0%</div>
+              <button class="profit-btn" onclick="adjustProfit(10)">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Special Materials Card -->
+      <div class="card" id="special-card">
+        <div class="card-header">
+          <h3><span class="emoji">✨</span> Materiais Especiais</h3>
+        </div>
+        <div class="card-body">
+          <div class="textarea-container" style="padding: 0;">
+            <label>Cole os valores ou descreva os materiais</label>
+            <textarea id="special-materials" placeholder="Ex: Glitter dourado R$ 5,00&#10;Fita de cetim R$ 3,50"></textarea>
+            <p class="textarea-hint">Os valores em R$ serão detectados automaticamente</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="clear-section">
+        <button class="clear-btn" onclick="clearAll()">🗑️ Limpar tudo</button>
+      </div>
+    </div>
+
+    <!-- Quick Budget Tab -->
+    <div id="quick-tab" class="tab-content">
+      <div class="tip-banner">
+        <span class="icon">⚡</span>
+        <p>Modo rápido: insira o valor final diretamente sem precisar calcular os custos.</p>
+      </div>
+
+      <div class="quick-form">
+        <div class="form-group">
+          <label>Nome da sua empresa</label>
+          <input type="text" id="quick-company" placeholder="Ex: Ateliê da Maria">
+        </div>
+        <div class="form-group">
+          <label>Nome do cliente</label>
+          <input type="text" id="quick-client" placeholder="Ex: João Silva">
+        </div>
+        <div class="form-group">
+          <label>Descrição do projeto (opcional)</label>
+          <textarea id="quick-description" placeholder="Ex: 10 topos de bolo personalizados"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Valor final</label>
+          <div class="price-input-large">
+            <span>R$</span>
+            <input type="number" id="quick-price" placeholder="0,00" step="0.01" min="0">
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Bar -->
+  <div class="bottom-bar">
+    <div class="total-display">
+      <span class="total-label">Valor final</span>
+      <span class="total-value" id="total-value">R$ 0,00</span>
+    </div>
+    <button class="generate-btn" id="generate-btn" onclick="openModal()">Gerar Orçamento</button>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Orçamento</h2>
+        <button class="close-btn" onclick="closeModal()">×</button>
+      </div>
+
+      <!-- Info form for calculator mode -->
+      <div class="info-form" id="info-form">
+        <div class="form-group">
+          <label>Nome da sua empresa</label>
+          <input type="text" id="modal-company" placeholder="Ex: Ateliê da Maria">
+        </div>
+        <div class="form-group">
+          <label>Nome do cliente</label>
+          <input type="text" id="modal-client" placeholder="Ex: João Silva">
+        </div>
+        <div class="form-group">
+          <label>Descrição do projeto</label>
+          <textarea id="modal-description" placeholder="Ex: 10 topos de bolo personalizados"></textarea>
+        </div>
+      </div>
+
+      <!-- Calculated Value Display -->
+      <div class="calculated-value-display" id="calculated-value-display" style="background: var(--secondary-light); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; text-align: center;">
+        <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 4px;">Valor calculado</div>
+        <div id="modal-calculated-value" style="font-size: 28px; font-weight: 700; color: var(--primary);">R$ 0,00</div>
+      </div>
+
+      <!-- Budget Preview -->
+      <div class="budget-preview" id="budget-preview">
+        <div class="title" style="font-size: 20px; margin-bottom: 16px;">Seu orçamento está pronto!</div>
+        <div class="client-label">Cliente</div>
+        <div class="client-name" id="preview-client">Nome do Cliente</div>
+        <div class="description" id="preview-description"></div>
+        <div class="divider"></div>
+        <div class="price-label">Valor total</div>
+        <div class="price-value" id="preview-price">R$ 0,00</div>
+        <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.2);">
+          <div style="font-size: 14px; opacity: 0.9; margin-bottom: 4px;">Obrigado pela preferência!</div>
+          <div id="preview-company" style="font-size: 16px; font-weight: 700;"></div>
+        </div>
+        <div class="date" id="preview-date"></div>
+      </div>
+
+      <!-- Actions -->
+      <div class="modal-actions">
+        <button class="action-btn primary" onclick="downloadImage()" style="flex: 1;">
+          <span>📥</span> Baixar imagem
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden Canvas for Image Generation -->
+  <canvas id="budgetCanvas" width="1080" height="1350"></canvas>
+
+  <script>
+    // Material data
+    const materialsData = [
+      { id: "impressao", nome: "Impressão colorida", preco: 1.00, qty: 0, step: 1 },
+      { id: "papel-offset", nome: "Papel Offset/Cartão", preco: 0.29, qty: 0, step: 1 },
+      { id: "papel-foto", nome: "Papel Fotográfico", preco: 0.32, qty: 0, step: 1 },
+      { id: "papel-lamicote", nome: "Papel Lamicote", preco: 1.19, qty: 0, step: 1 },
+      { id: "papel-color", nome: "Papel Color", preco: 0.83, qty: 0, step: 1 },
+      { id: "palitos-grande", nome: "Palitos Grande", preco: 0.23, qty: 0, step: 1 },
+      { id: "palitos-medio", nome: "Palitos Médio", preco: 0.14, qty: 0, step: 1 },
+      { id: "palitos-pequeno", nome: "Palitos Pequeno", preco: 0.06, qty: 0, step: 1 },
+      { id: "cola-quente", nome: "Cola Quente", preco: 0.10, qty: 0, step: 1 },
+      { id: "fita-banana", nome: "Fita Banana (5cm)", preco: 0.14, qty: 0, step: 1 },
+      { id: "embalagem", nome: "Embalagem/Sacola", preco: 1.00, qty: 0, step: 1 },
+    ];
+
+    let laborQty = 0;
+    let profitMargin = 0;
+    let currentTab = 'calculator';
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      renderMaterials();
+      updateTotal();
+      setupTabNavigation();
+      setupPreviewUpdates();
+    });
+
+    // Tab Navigation
+    function setupTabNavigation() {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tab = btn.dataset.tab;
+          currentTab = tab;
+
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          document.getElementById(tab + '-tab').classList.add('active');
+
+          // Update bottom bar for quick mode
+          if (tab === 'quick') {
+            document.getElementById('total-value').textContent = formatCurrency(parseFloat(document.getElementById('quick-price').value) || 0);
+          } else {
+            updateTotal();
+          }
+        });
+      });
+
+      // Quick price input listener
+      document.getElementById('quick-price').addEventListener('input', () => {
+        const price = parseFloat(document.getElementById('quick-price').value) || 0;
+        document.getElementById('total-value').textContent = formatCurrency(price);
+      });
+    }
+
+    // Render materials list
+    function renderMaterials() {
+      const container = document.getElementById('materials-list');
+      container.innerHTML = materialsData.map(m => `
+        <div class="material-item">
+          <div class="material-name">${m.nome}</div>
+          <div class="material-controls">
+            <div class="price-input-group">
+              <span>R$</span>
+              <input type="number" id="price-${m.id}" value="${m.preco.toFixed(2)}" step="0.01" min="0" onchange="updateTotal()">
+            </div>
+            <div class="qty-controls">
+              <button class="qty-btn" onclick="adjustQty('${m.id}', -${m.step})">−</button>
+              <div class="qty-value" id="qty-${m.id}">${m.qty}</div>
+              <button class="qty-btn" onclick="adjustQty('${m.id}', ${m.step})">+</button>
+            </div>
+          </div>
+          <div class="material-subtotal" id="subtotal-${m.id}"></div>
+        </div>
+      `).join('');
+    }
+
+    // Adjust quantity
+    function adjustQty(id, delta) {
+      const material = materialsData.find(m => m.id === id);
+      if (material) {
+        material.qty = Math.max(0, material.qty + delta);
+        document.getElementById('qty-' + id).textContent = material.qty;
+        updateTotal();
+      }
+    }
+
+    // Adjust labor quantity (whole numbers only)
+    function adjustLaborQty(delta) {
+      const newQty = laborQty + delta;
+      if (newQty >= 0) {
+        laborQty = Math.floor(newQty);
+        document.getElementById('labor-qty').textContent = laborQty;
+        updateTotal();
+      }
+    }
+
+    // Adjust profit margin (only in increments of 10)
+    function adjustProfit(delta) {
+      const newMargin = profitMargin + delta;
+      if (newMargin >= 0 && newMargin <= 100) {
+        profitMargin = newMargin;
+        document.getElementById('profit-value').textContent = profitMargin + '%';
+        updateTotal();
+      }
+    }
+
+    // Parse special materials
+    function parseSpecialMaterials() {
+      const text = document.getElementById('special-materials').value;
+      if (!text.trim()) return 0;
+
+      let total = 0;
+      const matches = text.match(/(?:R\$\s*)?(\d+(?:[,\.]\d{1,2})?)/g);
+      if (matches) {
+        matches.forEach(match => {
+          const value = parseFloat(match.replace('R$', '').replace(',', '.').trim());
+          if (!isNaN(value)) total += value;
+        });
+      }
+      return total;
+    }
+
+    // Update total
+    function updateTotal() {
+      let materialsTotal = 0;
+      materialsData.forEach(m => {
+        const price = parseFloat(document.getElementById('price-' + m.id)?.value) || m.preco;
+        const subtotal = price * m.qty;
+        materialsTotal += subtotal;
+        
+        const subtotalEl = document.getElementById('subtotal-' + m.id);
+        if (subtotalEl) {
+          subtotalEl.textContent = subtotal > 0 ? '= ' + formatCurrency(subtotal) : '';
+        }
+      });
+
+      const laborPrice = parseFloat(document.getElementById('labor-price').value) || 0;
+      const laborTotal = laborPrice * laborQty;
+      document.getElementById('labor-subtotal').textContent = laborTotal > 0 ? '= ' + formatCurrency(laborTotal) : '';
+
+      const specialTotal = parseSpecialMaterials();
+      const subtotal = materialsTotal + laborTotal + specialTotal;
+      const profitAmount = subtotal * (profitMargin / 100);
+      const total = subtotal + profitAmount;
+
+      document.getElementById('total-value').textContent = formatCurrency(total);
+    }
+
+    // Special materials listener
+    document.getElementById('special-materials').addEventListener('input', updateTotal);
+
+    // Format currency
+    function formatCurrency(value) {
+      return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    // Toggle card
+    function toggleCard(cardId) {
+      document.getElementById(cardId).classList.toggle('open');
+    }
+
+    // Clear all
+    function clearAll() {
+      materialsData.forEach(m => m.qty = 0);
+      laborQty = 0;
+      profitMargin = 0;
+      
+      document.getElementById('special-materials').value = '';
+      document.getElementById('labor-qty').textContent = '0';
+      document.getElementById('profit-value').textContent = '0%';
+      document.getElementById('labor-price').value = '6.90';
+      
+      renderMaterials();
+      updateTotal();
+    }
+
+    // Modal functions
+    function openModal() {
+      const modal = document.getElementById('modal');
+      const infoForm = document.getElementById('info-form');
+      const calculatedValueDisplay = document.getElementById('calculated-value-display');
+      
+      if (currentTab === 'quick') {
+        infoForm.style.display = 'none';
+        calculatedValueDisplay.style.display = 'none';
+        const company = document.getElementById('quick-company').value || 'Sua Empresa';
+        const client = document.getElementById('quick-client').value || 'Cliente';
+        const description = document.getElementById('quick-description').value;
+        const price = parseFloat(document.getElementById('quick-price').value) || 0;
+        
+        updatePreview(company, client, description, price);
+      } else {
+        infoForm.style.display = 'block';
+        calculatedValueDisplay.style.display = 'block';
+        const price = parseCurrency(document.getElementById('total-value').textContent);
+        document.getElementById('modal-calculated-value').textContent = formatCurrency(price);
+        updatePreview('', '', '', price);
+      }
+      
+      modal.classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('active');
+    }
+
+    // Setup preview updates for calculator mode
+    function setupPreviewUpdates() {
+      ['modal-company', 'modal-client', 'modal-description'].forEach(id => {
+        document.getElementById(id).addEventListener('input', () => {
+          if (currentTab === 'calculator') {
+            const company = document.getElementById('modal-company').value || 'Sua Empresa';
+            const client = document.getElementById('modal-client').value || 'Cliente';
+            const description = document.getElementById('modal-description').value;
+            const price = parseCurrency(document.getElementById('total-value').textContent);
+            updatePreview(company, client, description, price);
+          }
+        });
+      });
+    }
+
+    function parseCurrency(str) {
+      return parseFloat(str.replace('R$', '').replace(/\./g, '').replace(',', '.').trim()) || 0;
+    }
+
+    function updatePreview(company, client, description, price) {
+      document.getElementById('preview-company').textContent = company;
+      document.getElementById('preview-client').textContent = client;
+      document.getElementById('preview-description').textContent = description;
+      document.getElementById('preview-description').style.display = description ? 'block' : 'none';
+      document.getElementById('preview-price').textContent = formatCurrency(price);
+      
+      const now = new Date();
+      document.getElementById('preview-date').textContent = now.toLocaleDateString('pt-BR') + ' às ' + now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // Generate budget image
+    function generateBudgetImage() {
+      const canvas = document.getElementById('budgetCanvas');
+      const ctx = canvas.getContext('2d');
+      
+      // Background gradient
+      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      gradient.addColorStop(0, '#6B3FA0');
+      gradient.addColorStop(1, '#8B5FBF');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Get data
+      let company, client, description, price;
+      if (currentTab === 'quick') {
+        company = document.getElementById('quick-company').value || 'Sua Empresa';
+        client = document.getElementById('quick-client').value || 'Cliente';
+        description = document.getElementById('quick-description').value;
+        price = parseFloat(document.getElementById('quick-price').value) || 0;
+      } else {
+        company = document.getElementById('modal-company').value || 'Sua Empresa';
+        client = document.getElementById('modal-client').value || 'Cliente';
+        description = document.getElementById('modal-description').value;
+        price = parseCurrency(document.getElementById('total-value').textContent);
+      }
+
+      ctx.fillStyle = 'white';
+      ctx.textAlign = 'left';
+
+      // Headline: "Seu orçamento está pronto"
+      ctx.globalAlpha = 1;
+      ctx.font = '700 56px Inter, sans-serif';
+      ctx.fillText('Seu orçamento está pronto', 80, 150);
+
+      // Decorative line
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.fillRect(80, 190, 400, 3);
+      ctx.fillStyle = 'white';
+
+      // Client
+      ctx.globalAlpha = 0.8;
+      ctx.font = '400 28px Inter, sans-serif';
+      ctx.fillText('Cliente', 80, 290);
+      ctx.globalAlpha = 1;
+      ctx.font = '600 42px Inter, sans-serif';
+      ctx.fillText(client, 80, 350);
+
+      // Description
+      let currentY = 450;
+      if (description) {
+        ctx.globalAlpha = 0.9;
+        ctx.font = '400 32px Inter, sans-serif';
+        currentY = wrapTextAndGetY(ctx, description, 80, currentY, 920, 44);
+        currentY += 60;
+      }
+
+      // Divider
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.fillRect(80, currentY, 920, 2);
+      ctx.fillStyle = 'white';
+
+      // Price
+      ctx.globalAlpha = 0.8;
+      ctx.font = '400 28px Inter, sans-serif';
+      ctx.fillText('Valor total', 80, currentY + 80);
+      ctx.globalAlpha = 1;
+      ctx.font = '700 96px Inter, sans-serif';
+      ctx.fillText(formatCurrency(price), 80, currentY + 180);
+
+      // "Obrigado pela preferência" + Company name
+      ctx.globalAlpha = 0.9;
+      ctx.font = '400 28px Inter, sans-serif';
+      ctx.fillText('Obrigado pela preferência', 80, currentY + 300);
+      ctx.globalAlpha = 1;
+      ctx.font = '700 36px Inter, sans-serif';
+      ctx.fillText(company, 80, currentY + 350);
+
+      // Date (bottom-right)
+      const now = new Date();
+      ctx.globalAlpha = 0.7;
+      ctx.font = '400 24px Inter, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(now.toLocaleDateString('pt-BR') + ' às ' + now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }), 1000, 1280);
+
+      return canvas.toDataURL('image/png');
+    }
+
+    // Text wrap helper that returns final Y position
+    function wrapTextAndGetY(ctx, text, x, y, maxWidth, lineHeight) {
+      const words = text.split(' ');
+      let line = '';
+      let currentY = y;
+
+      words.forEach(word => {
+        const testLine = line + word + ' ';
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && line !== '') {
+          ctx.fillText(line.trim(), x, currentY);
+          line = word + ' ';
+          currentY += lineHeight;
+        } else {
+          line = testLine;
+        }
+      });
+      ctx.fillText(line.trim(), x, currentY);
+      return currentY;
+    }
+
+    // Text wrap helper
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+      const words = text.split(' ');
+      let line = '';
+      let currentY = y;
+
+      words.forEach(word => {
+        const testLine = line + word + ' ';
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && line !== '') {
+          ctx.fillText(line.trim(), x, currentY);
+          line = word + ' ';
+          currentY += lineHeight;
+        } else {
+          line = testLine;
+        }
+      });
+      ctx.fillText(line.trim(), x, currentY);
+    }
+
+    // Download image
+    function downloadImage() {
+      const dataUrl = generateBudgetImage();
+      const link = document.createElement('a');
+      link.download = 'orcamento-' + Date.now() + '.png';
+      link.href = dataUrl;
+      link.click();
+    }
+
+    // Close modal on backdrop click
+    document.getElementById('modal').addEventListener('click', (e) => {
+      if (e.target.id === 'modal') closeModal();
+    });
+  </script>
+</script>
+</body>
+</html>
